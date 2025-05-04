@@ -13,10 +13,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 groq_api_key = st.secrets["GROQ_API_KEY"]
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
-os.environ["LANGCHAIN_TRACING_V2"] = st.secrets["LANGCHAIN_TRACING_V2"]
-os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"]
-
 llm = ChatGroq(groq_api_key=groq_api_key, model="Llama3-8b-8192")
 
 prompt = ChatPromptTemplate.from_template(
