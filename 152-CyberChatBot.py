@@ -4,7 +4,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
-from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_core.prompts import ChatPromptTemplate
 import os
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -27,24 +26,30 @@ prompt = ChatPromptTemplate.from_template(
     
     """)
 
+from langchain_community.document_loaders import PyPDFLoader
+
 def create_vector_embeddings():
 
     if "vectors" not in st.session_state:
         st.session_state.embeddings = HuggingFaceEmbeddings(model_name="all-Minilm-L6-v2")
 
-
-
         print(st.session_state.embeddings)
 
-        st.session_state.loader = PyPDFDirectoryLoader("Research-Paper")
+        # Load specific PDFs instead of a directory
+        pdf_files = ["Paper2.pdf", "Paper3.pdf"]  # Replace with your actual filenames
+        all_docs = []
+        for file_path in pdf_files:
+            loader = PyPDFLoader(file_path)
+            docs = loader.load()
+            all_docs.extend(docs)
 
-        st.session_state.docs = st.session_state.loader.load()
+        st.session_state.docs = all_docs
 
         st.session_state.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200,
-
         )
+
         st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
 
         st.session_state.vectors = FAISS.from_documents(
@@ -54,6 +59,7 @@ def create_vector_embeddings():
 
         st.write(f"Loaded {len(st.session_state.docs)} documents.")
         st.write(f"Split into {len(st.session_state.final_documents)} chunks.")
+
 
 
 user_prompt = st.text_input("Enter your question:")
